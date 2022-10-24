@@ -1,2 +1,4 @@
-.ipynb-checkpoints
+.ipynb_checkpoints
 env
+import.py
+__pycache__
