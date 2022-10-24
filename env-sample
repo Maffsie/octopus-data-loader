@@ -1,0 +1,12 @@
+export DEBUG=True
+export OCTOPUS_API_KEY=
+export MPAN=
+export ELEC_SERIAL=
+export MPRN=
+export GAS_SERIAL=
+export GAS_FACTOR=0
+export INFLUXDB_HOST=
+export INFLUXDB_PORT=
+export INFLUXDB_USE_SSL=True
+export INFLUXDB_VERIFY_SSL=True
+export INFLUXDB_USE_DB=
