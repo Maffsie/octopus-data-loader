@@ -7,7 +7,7 @@ from dateutil import parser
 from influxdb import InfluxDBClient
 from requests import get
 
-from .conf import Configurable
+from .conf import Configurable, LogLevel
 
 
 class Octopussy(Configurable):
@@ -26,6 +26,7 @@ class Octopussy(Configurable):
         "influxdb_verify_ssl": False,
         "influxdb_use_db": None,
         "influxdb_reset_db_contents": False,
+        "sleep_for_hours": 6,
         "dt_from": datetime.now() - timedelta(days=30),
         "dt_to": datetime.now(),
     }
@@ -87,13 +88,13 @@ class Octopussy(Configurable):
         }
         if page is not None:
             params["page"] = page
-        self.log(1, f"Will get {uri}")
+        self.log(LogLevel.VERBOSE, f"Will get {uri}")
         resp = get(uri, params=params, auth=(self.config["octopus_api_key"], ""))
         resp.raise_for_status()
         res = resp.json()
         ret = res.get("results", [])
         self.log(
-            1, f"Got {len(ret)} result(s) for range {dt_from} to {dt_to} (page {page})"
+            LogLevel.INFO, f"Got {len(ret)} result(s) for range {dt_from} to {dt_to} (page {page})"
         )
         if res["next"]:
             p_next = parse.urlparse(res["next"]).query
@@ -120,13 +121,13 @@ class Octopussy(Configurable):
             and len(resp.raw["series"][0]["values"]) > 0
         ):
             dt_from = resp.raw["series"][0]["values"][0][0]
-            self.log(3, f"Newest data for {series} from {dt_from}.")
+            self.log(LogLevel.NOTICE, f"Newest data for {series} from {dt_from}.")
         else:
             if bool(self.config["influxdb_reset_db_contents"]):
-                self.log(3, f"Resetting data for {series}, as the reset flag was set")
+                self.log(LogLevel.WARN, f"Resetting data for {series}, as the reset flag was set")
             else:
                 self.log(
-                    4, f"Unable to get last entry timestamp for {series} - resetting."
+                    LogLevel.WARN, f"Unable to get last entry timestamp for {series} - resetting."
                 )
             self.db.query(f"DROP SERIES FROM {series}")
         return dt_from, dt_to

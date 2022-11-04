@@ -1,8 +1,10 @@
-from Octo import Octopussy
-from dotenv import load_dotenv as loadenv
 from time import sleep
 
-loadenv(dotenv_path="/data/octopus/env")
+from envload import preconfigure
+from Octo import Octopussy
+
+preconfigure()
+
 o = Octopussy()
 metrics = ["electricity", "gas"]
 
@@ -11,4 +13,5 @@ while True:
     # Run once every 6 hours
     # Octopus doesn't guarantee data will be available for the last day by any particular time
     # this made me wish for a python equivalent of ruby's `int.hours` for the first time
-    sleep((6*60)*60)
+    o.log("INFO", f"Sleeping for {o.config['sleep_for_hours']} hours")
+    sleep((o.config['sleep_for_hours']*60)*60)
